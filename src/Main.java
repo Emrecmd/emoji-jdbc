@@ -2,6 +2,7 @@ import controller.PersonController;
 import entity.Person;
 
 import java.util.Scanner;
+import ui.MainUI;
 
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
@@ -9,6 +10,11 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 
+
+        MainUI.main(args);
+
+
+        /*
         PersonController controller = new PersonController();
         Scanner scanner = new Scanner(System.in);
 
@@ -67,6 +73,6 @@ public class Main {
         else {
             System.out.println("geçersiz işlem. çıkış yapılıyor...");
             return;
-        }
+        }*/
     }
 }
