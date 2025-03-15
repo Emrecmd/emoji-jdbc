@@ -7,16 +7,18 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 
 public class MainUI {
     private PersonController controller;
 
-    // Swing bileşenleri
     private JFrame frame;
     private JPanel panel;
     private JTextField nameField, ageField, emojiField, idField;
     private JTextArea outputArea;
-    private JButton addButton, deleteButton, updateButton, listButton;
+    private JButton addButton, deleteButton, updateButton, listButton, bulkAddButton;
 
     public MainUI() {
         controller = new PersonController();
@@ -24,65 +26,51 @@ public class MainUI {
     }
 
     private void initializeUI() {
-        // Ana pencere
         frame = new JFrame("Person CRUD Operations");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400);
         frame.setLayout(new BorderLayout());
 
-        // Ana panel
         panel = new JPanel();
         panel.setLayout(new FlowLayout());
 
-        // Butonlar
         addButton = new JButton("Ekle");
         deleteButton = new JButton("Sil");
         updateButton = new JButton("Güncelle");
         listButton = new JButton("Listele");
+        bulkAddButton = new JButton("Toplu Ekle");
 
-        // Listeleme alanı
         outputArea = new JTextArea(10, 30);
         outputArea.setEditable(false);
         JScrollPane scrollPane = new JScrollPane(outputArea);
 
-        // Buton aksiyonları
-        addButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearPanel();
-                createAddFields();
-            }
+        addButton.addActionListener(e -> {
+            clearPanel();
+            createAddFields();
         });
 
-        deleteButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearPanel();
-                createDeleteFields();
-            }
+        deleteButton.addActionListener(e -> {
+            clearPanel();
+            createDeleteFields();
         });
 
-        updateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearPanel();
-                createUpdateFields();
-            }
+        updateButton.addActionListener(e -> {
+            clearPanel();
+            createUpdateFields();
         });
 
-        listButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearPanel();
-                listPersons();
-            }
+        listButton.addActionListener(e -> {
+            clearPanel();
+            listPersons();
         });
 
-        // Butonları panel'e ekleme
+        bulkAddButton.addActionListener(e -> bulkAddPersons());
+
         panel.add(addButton);
         panel.add(deleteButton);
         panel.add(updateButton);
         panel.add(listButton);
+        panel.add(bulkAddButton);
 
         frame.add(panel, BorderLayout.NORTH);
         frame.add(scrollPane, BorderLayout.CENTER);
@@ -90,25 +78,20 @@ public class MainUI {
         frame.setVisible(true);
     }
 
-    // Ekleme input alanlarını oluştur
     private void createAddFields() {
-        // Temizlemeden sonra inputları ekle
         nameField = new JTextField(20);
         ageField = new JTextField(20);
         emojiField = new JTextField(20);
 
         JButton submitButton = new JButton("Ekle");
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String name = nameField.getText();
-                int age = Integer.parseInt(ageField.getText());
-                String emoji = emojiField.getText();
-                controller.addPerson(name, age, emoji);
-                JOptionPane.showMessageDialog(frame, "Kişi Eklendi!");
-                clearPanel();
-                resetUI();
-            }
+        submitButton.addActionListener(e -> {
+            String name = nameField.getText();
+            int age = Integer.parseInt(ageField.getText());
+            String emoji = emojiField.getText();
+            controller.addPerson(name, age, emoji);
+            JOptionPane.showMessageDialog(frame, "Kişi Eklendi!");
+            clearPanel();
+            resetUI();
         });
 
         panel.add(new JLabel("İsim:"));
@@ -123,20 +106,16 @@ public class MainUI {
         frame.repaint();
     }
 
-    // Silme input alanlarını oluştur
     private void createDeleteFields() {
         idField = new JTextField(20);
 
         JButton submitButton = new JButton("Sil");
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int id = Integer.parseInt(idField.getText());
-                controller.deletePerson(id);
-                JOptionPane.showMessageDialog(frame, "Kişi Silindi!");
-                clearPanel();
-                resetUI();
-            }
+        submitButton.addActionListener(e -> {
+            int id = Integer.parseInt(idField.getText());
+            controller.deletePerson(id);
+            JOptionPane.showMessageDialog(frame, "Kişi Silindi!");
+            clearPanel();
+            resetUI();
         });
 
         panel.add(new JLabel("ID:"));
@@ -147,7 +126,6 @@ public class MainUI {
         frame.repaint();
     }
 
-    // Güncelleme input alanlarını oluştur
     private void createUpdateFields() {
         idField = new JTextField(20);
         nameField = new JTextField(20);
@@ -155,18 +133,15 @@ public class MainUI {
         emojiField = new JTextField(20);
 
         JButton submitButton = new JButton("Güncelle");
-        submitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int id = Integer.parseInt(idField.getText());
-                String name = nameField.getText();
-                int age = Integer.parseInt(ageField.getText());
-                String emoji = emojiField.getText();
-                controller.updatePersons(id, name, age, emoji);
-                JOptionPane.showMessageDialog(frame, "Kişi Güncellendi!");
-                clearPanel();
-                resetUI();
-            }
+        submitButton.addActionListener(e -> {
+            int id = Integer.parseInt(idField.getText());
+            String name = nameField.getText();
+            int age = Integer.parseInt(ageField.getText());
+            String emoji = emojiField.getText();
+            controller.updatePersons(id, name, age, emoji);
+            JOptionPane.showMessageDialog(frame, "Kişi Güncellendi!");
+            clearPanel();
+            resetUI();
         });
 
         panel.add(new JLabel("ID:"));
@@ -183,24 +158,50 @@ public class MainUI {
         frame.repaint();
     }
 
-    // Listeleme alanını oluştur
     private void listPersons() {
-        outputArea.setText(""); // Önceki sonuçları temizle
+        outputArea.setText("");
         for (Person p : controller.getAllPersons()) {
             outputArea.append(p.getEmoji() + " - " + p.getAge() + " - " + p.getName() + "\n");
         }
     }
 
-    // Paneli temizle
+    private void bulkAddPersons() {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("CSV Dosyası Seçin");
+        fileChooser.setFileFilter(new javax.swing.filechooser.FileNameExtensionFilter("CSV Dosyaları", "csv"));
+
+        int result = fileChooser.showOpenDialog(frame);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+                String line;
+                int count = 0;
+                while ((line = br.readLine()) != null) {
+                    String[] data = line.split(",");
+                    if (data.length == 3) {
+                        String name = data[0].trim();
+                        int age = Integer.parseInt(data[1].trim());
+                        String emoji = data[2].trim();
+                        controller.addPerson(name, age, emoji);
+                        count++;
+                    }
+                }
+                JOptionPane.showMessageDialog(frame, count + " kişi başarıyla eklendi!");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Hata: " + ex.getMessage());
+            }
+        }
+    }
+
     private void clearPanel() {
         panel.removeAll();
         panel.add(addButton);
         panel.add(deleteButton);
         panel.add(updateButton);
         panel.add(listButton);
+        panel.add(bulkAddButton);
     }
 
-    // UI'yi sıfırla
     private void resetUI() {
         frame.revalidate();
         frame.repaint();
